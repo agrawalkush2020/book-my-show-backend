@@ -22,3 +22,10 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.name
+
+class Timing(models.Model):
+    time = models.TimeField()  # Field to store the timing of the movie
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='timings')  # Link to the Movie model
+
+    def __str__(self):
+        return f'{self.movie.name} at {self.time}'
