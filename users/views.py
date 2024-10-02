@@ -1,4 +1,4 @@
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import HttpResponse
 import json
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
@@ -12,20 +12,18 @@ def handle_signup(request):
         credentials = json.loads(request.body)
 
         # Extract credentials
-        username = credentials.get('userName')
         email = credentials.get('email')
         phone_number = credentials.get('phoneNumber')
         full_name = credentials.get('fullName')
         password = credentials.get('password')
 
         # Check if user already exists
-        if CustomUser.is_existing_user(username=username, email=email, phone_number=phone_number):
+        if CustomUser.is_existing_user(email=email, phone_number=phone_number):
             return HttpResponse(json.dumps({"success": False, "message": "User Already Exists!"}),
                                 content_type="application/json")
 
         # Create new user
         new_user = CustomUser(
-            username=username,
             email=email,
             phone_number=phone_number,
             full_name=full_name,
@@ -45,20 +43,15 @@ def handle_login(request):
         credentials = json.loads(request.body)
 
         # Extract credentials
-        username = credentials.get('userName')
+        phone_number = credentials.get('phoneNumber')
         password = credentials.get('password')
 
-        # Check if user already exists
-        # if CustomUser.is_existing_user(username=username) is False:
-        #     return HttpResponse(json.dumps({"success": False, "message": "Wrong Username !!"}),
-        #                         content_type="application/json")
-
-        # agr credentials match krgye toh user ka object return otherwise None return hoga
-        user = authenticate(request, username=username, password=password)
+        # checking if any use with credentials exist
+        user = authenticate(request, phone_number=phone_number, password=password)
 
         if user is not None:
             login(request, user)
-            return HttpResponse(json.dumps({"success": True, 'user': user.username}),
+            return HttpResponse(json.dumps({"success": True, 'user': user.full_name}),
                                 content_type="application/json", status=200)
         else:
             return HttpResponse(json.dumps({"success": False, 'message': 'Invalid Password!'}),
@@ -67,7 +60,7 @@ def handle_login(request):
     # when request method is not Post
     else:
         print(f'{request.method}')
-        response_data = json.dumps({"success": False,'message': 'Invalid request method'})
+        response_data = json.dumps({"success": False, 'message': 'Invalid request method'})
         return HttpResponse(response_data, content_type="application/json", status=405)
 
 
@@ -76,13 +69,3 @@ def handle_login(request):
 def handle_logout(request):
     logout(request)
     return HttpResponse(json.dumps({"success": True}), content_type="application/json", status=200)
-
-
-@csrf_exempt
-def fetch_all_users(request):
-    # Get the current logged-in user's username
-    current_username = request.user.username
-    # Fetch all users except superusers and the current logged-in user
-    users = CustomUser.objects.filter(is_superuser=False).exclude(username=current_username).values_list('username', flat=True)
-    return JsonResponse({'success':True,'users':users,'current_username':current_username},status=200)
-
