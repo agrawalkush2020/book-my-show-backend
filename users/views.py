@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from .models import CustomUser
 from django.contrib.auth import authenticate, login, logout
+from movies.utility import get_all_movies_for_city
 
 @csrf_exempt
 def handle_signup(request):
@@ -49,13 +50,29 @@ def handle_login(request):
         # checking if any user with credentials exist
         user = authenticate(request, phone_number=phone_number, password=password)
 
-        if user is not None:
+        if user is None:
+            return HttpResponse(
+                json.dumps({"success": False, 'message': 'Invalid phone number or password!'}),
+                content_type="application/json",
+                status=200
+            )
+
+        try:
             login(request, user)
-            return HttpResponse(json.dumps({"success": True, 'user': user.full_name}),
+            movies = get_all_movies_for_city()
+
+            return HttpResponse(json.dumps({"success": True,
+                                            'user': user.full_name,
+                                            'movies': movies}),
                                 content_type="application/json", status=200)
-        else:
-            return HttpResponse(json.dumps({"success": False, 'message': 'Invalid Password!'}),
-                                content_type="application/json", status=200)
+
+        except Exception as ex:
+            return HttpResponse(
+                json.dumps({"success": False, 'message': 'Something went Wrong!'}),
+                content_type="application/json",
+                status=200
+            )
+
 
     # when request method is not Post
     else:
