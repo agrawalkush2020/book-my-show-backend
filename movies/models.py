@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 class City(models.Model):
@@ -9,6 +10,7 @@ class City(models.Model):
 
 class Location(models.Model):
     address = models.CharField(max_length=255)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='locations')  # ForeignKey to City
 
     def __str__(self):
         return f'{self.address}'
@@ -23,6 +25,7 @@ class Timing(models.Model):
 
 
 class Movie(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID field
     name = models.CharField(max_length=100)
     cities = models.ManyToManyField(City, related_name='movies')
     locations = models.ManyToManyField(Location, related_name='locations')
@@ -31,4 +34,3 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.name
-

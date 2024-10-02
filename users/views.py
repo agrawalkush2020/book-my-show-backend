@@ -46,7 +46,7 @@ def handle_login(request):
         phone_number = credentials.get('phoneNumber')
         password = credentials.get('password')
 
-        # checking if any use with credentials exist
+        # checking if any user with credentials exist
         user = authenticate(request, phone_number=phone_number, password=password)
 
         if user is not None:
