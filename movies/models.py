@@ -46,7 +46,7 @@ class Screen(models.Model):
     display_name = models.CharField(max_length=100, default='Standard Screen')  # Display name
 
     def __str__(self):
-        return f'{self.display_name} at {self.cinema.name if self.cinema else "No Cinema"}'
+        return f'{self.display_name} at {self.cinema.name}'
 
 
 class Movie(models.Model):
