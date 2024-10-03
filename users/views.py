@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from .models import CustomUser
 from django.contrib.auth import authenticate, login, logout
-from movies.utility import get_all_movies_for_city
+# from movies.utility import get_all_movies_for_city
 
 @csrf_exempt
 def handle_signup(request):
@@ -59,11 +59,11 @@ def handle_login(request):
 
         try:
             login(request, user)
-            movies = get_all_movies_for_city()
+            # movies = get_all_movies_for_city()
 
             return HttpResponse(json.dumps({"success": True,
-                                            'user': user.full_name,
-                                            'movies': movies}),
+                                            'user': user.full_name}),
+                                            # 'movies': movies}),
                                 content_type="application/json", status=200)
 
         except Exception as ex:
