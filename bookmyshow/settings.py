@@ -26,13 +26,36 @@ SECRET_KEY = 'django-insecure-*(p#o=e*(3wwy78((k52srdg8d^t^j*l7=#p2gn7y#8=$%--%r
 DEBUG = True
 
 ALLOWED_HOSTS = []
+AUTH_USER_MODEL = 'users.CustomUser'
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'https://yoursite.com',  # Ensure this is a valid URL
+]
+CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'accept',
+    'X-Requested-With',
+    'Authorization',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'OPTIONS',
+    'PUT',
+    'DELETE',
+]
 # Application definition
 
 INSTALLED_APPS = [
     'users',
     'movies',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +65,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Ensure this is high in the list
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,6 +73,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'users.authentication.PhoneNumberBackend',  # Replace 'yourapp' with your app name
+    'django.contrib.auth.backends.ModelBackend',  # Keep this to allow default username/password auth
 ]
 
 ROOT_URLCONF = 'bookmyshow.urls'
