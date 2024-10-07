@@ -1,65 +1,74 @@
+import random
 from django.core.management.base import BaseCommand
 from movies.models import ServiceProvider, City, Mall, Cinema, Screen, Movie, Show
-from django.utils import timezone
+from datetime import datetime, timedelta
 
 class Command(BaseCommand):
-    help = 'Populate the database with initial data'
+    help = 'Populates the database with sample data'
 
     def handle(self, *args, **kwargs):
         # Create Service Providers
-        pvr = ServiceProvider.objects.create(name='PVR', external_eatables_allowed=True)
-        imax = ServiceProvider.objects.create(name='IMAX', external_eatables_allowed=False)
+        providers = [
+            ServiceProvider(name='PVR', external_eatables_allowed=True),
+            ServiceProvider(name='IMAX', external_eatables_allowed=False),
+            ServiceProvider(name='Inox', external_eatables_allowed=False)
+        ]
+        ServiceProvider.objects.bulk_create(providers)
+        self.stdout.write(self.style.SUCCESS('Service providers created.'))
 
         # Create Cities
-        delhi = City.objects.create(name='Delhi', pin_code='110001')
-        gurgaon = City.objects.create(name='Gurgaon', pin_code='122018')
+        cities = [
+            City(name='New Delhi', pin_code='110001'),
+            City(name='Mumbai', pin_code='400001'),
+            City(name='Bangalore', pin_code='560001')
+        ]
+        City.objects.bulk_create(cities)
+        self.stdout.write(self.style.SUCCESS('Cities created.'))
 
         # Create Malls
-        mall1 = Mall.objects.create(city=delhi)
-        mall2 = Mall.objects.create(city=gurgaon)
+        malls = [
+            Mall(city=cities[0]),
+            Mall(city=cities[1]),
+            Mall(city=cities[2]),
+        ]
+        Mall.objects.bulk_create(malls)
+        self.stdout.write(self.style.SUCCESS('Malls created.'))
 
         # Create Cinemas
-        cinema1 = Cinema.objects.create(service_provider=pvr, mall=mall1, city=delhi, is_multiplex=True)
-        cinema2 = Cinema.objects.create(service_provider=imax, mall=mall2, city=gurgaon, is_multiplex=False)
+        cinemas = [
+            Cinema(service_provider=providers[0], mall=malls[0], city=cities[0], is_multiplex=True),
+            Cinema(service_provider=providers[1], mall=malls[1], city=cities[1], is_multiplex=False),
+            Cinema(service_provider=providers[2], mall=malls[2], city=cities[2], is_multiplex=True),
+        ]
+        Cinema.objects.bulk_create(cinemas)
+        self.stdout.write(self.style.SUCCESS('Cinemas created.'))
 
         # Create Screens
-        screen1 = Screen.objects.create(name='Screen 1', cinema=cinema1, display_name='IMAX Screen')
-        screen2 = Screen.objects.create(name='Screen 2', cinema=cinema2, display_name='Standard Screen')
+        screens = [
+            Screen(name='Screen 1', cinema=cinemas[0], display_name='IMAX 3D Screen'),
+            Screen(name='Screen 2', cinema=cinemas[1], display_name='Dolby Cinema'),
+            Screen(name='Screen 3', cinema=cinemas[2], display_name='4DX Screen')
+        ]
+        Screen.objects.bulk_create(screens)
+        self.stdout.write(self.style.SUCCESS('Screens created.'))
 
         # Create Movies
-        movie1 = Movie.objects.create(
-            name='Avengers: Endgame',
-            actors='Robert Downey Jr., Chris Evans, Scarlett Johansson',
-            director='Anthony Russo',
-            producer='Kevin Feige',
-            duration=181,
-            trailer='https://www.youtube.com/watch?v=TcMBFSGVi1c',
-            rating=8.4
-        )
-        movie2 = Movie.objects.create(
-            name='Inception',
-            actors='Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page',
-            director='Christopher Nolan',
-            producer='Emma Thomas',
-            duration=148,
-            trailer='https://www.youtube.com/watch?v=YoHD9X2yJgA',
-            rating=8.8
-        )
+        movies = [
+            Movie(name='The Matrix', actors='Keanu Reeves, Laurence Fishburne', director='Wachowskis', producer='Joel Silver', duration=136, trailer='https://youtube.com/matrix', rating=8.7),
+            Movie(name='Inception', actors='Leonardo DiCaprio, Joseph Gordon-Levitt', director='Christopher Nolan', producer='Emma Thomas', duration=148, trailer='https://youtube.com/inception', rating=8.8),
+            Movie(name='Interstellar', actors='Matthew McConaughey, Anne Hathaway', director='Christopher Nolan', producer='Emma Thomas', duration=169, trailer='https://youtube.com/interstellar', rating=8.6)
+        ]
+        Movie.objects.bulk_create(movies)
+        self.stdout.write(self.style.SUCCESS('Movies created.'))
 
         # Create Shows
-        Show.objects.create(
-            cinema=cinema1,
-            movie=movie1,
-            screen=screen1,
-            start_time=timezone.now().replace(hour=14, minute=0),
-            end_time=timezone.now().replace(hour=17, minute=1)
-        )
-        Show.objects.create(
-            cinema=cinema2,
-            movie=movie2,
-            screen=screen2,
-            start_time=timezone.now().replace(hour=18, minute=0),
-            end_time=timezone.now().replace(hour=20, minute=28)
-        )
+        show_time = datetime.now()
+        shows = [
+            Show(cinema=cinemas[0], movie=movies[0], screen=screens[0], start_time=show_time, end_time=show_time + timedelta(hours=2)),
+            Show(cinema=cinemas[1], movie=movies[1], screen=screens[1], start_time=show_time, end_time=show_time + timedelta(hours=2)),
+            Show(cinema=cinemas[2], movie=movies[2], screen=screens[2], start_time=show_time, end_time=show_time + timedelta(hours=3))
+        ]
+        Show.objects.bulk_create(shows)
+        self.stdout.write(self.style.SUCCESS('Shows created.'))
 
-        self.stdout.write(self.style.SUCCESS('Database populated successfully!'))
+        self.stdout.write(self.style.SUCCESS('Database populated successfully.'))
