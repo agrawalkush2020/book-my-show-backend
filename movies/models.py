@@ -22,6 +22,7 @@ class City(models.Model):
 
 class Mall(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID field
+    name = models.CharField(max_length=100, default='Unknown Mall')  # Mall name
     city = models.ForeignKey(City, on_delete=models.CASCADE)  # Foreign key linking to City model
 
     def __str__(self):
@@ -75,3 +76,17 @@ class Show(models.Model):
 
     def __str__(self):
         return f'Show of {self.movie.name} at {self.cinema} starting {self.start_time}'
+
+
+
+
+# List to start a bookmyshow .
+# 	• Show all the movies in the default city - gurgaon
+# 	• Then after selecting the movie, all the locations should be shown in the city(with or without price).
+# 	• If a person clicks a location, then he should see all the timings and price(constant for all timings).
+# 	• And when he confirms a time then Form to fill basic details like name and email_id.
+# 	• And after confirm, He should see a confirmed seat number(random).
+# 	• add a payment gateway, razorpay or stripe integration
+
+
+ # cities, movies, locations, timings and price,
