@@ -1,10 +1,13 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
+# super user
+# id: kush
+# password: kush
 
 class CustomUser(AbstractUser):
     full_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=10, unique=True)
+    phone_number = models.CharField(max_length=10, unique=False)
     email = models.EmailField(unique=True)  # Ensuring email uniqueness
 
 

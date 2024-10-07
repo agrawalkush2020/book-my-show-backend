@@ -68,10 +68,10 @@ class Show(models.Model):
     cinema = models.ForeignKey(Cinema, on_delete=models.CASCADE)  # Foreign key linking to Cinema
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)  # Foreign key linking to Movie
     screen = models.ForeignKey(Screen, on_delete=models.CASCADE)  # Foreign key linking to Screen
-    start_time = models.TimeField(default='12:00:00')  # Default start time
-    end_time = models.TimeField(default='14:00:00')  # Default end time
-    interval_time = models.TimeField(blank=True, null=True)  # Time of interval
+    start_time = models.DateTimeField(default='2024-01-01 12:00:00')  # Default start time with a date
+    end_time = models.DateTimeField(default='2024-01-01 14:00:00')  # Default end time with a date
+    interval_time = models.TimeField(blank=True, null=True)  # Time of interval (optional)
     interval_duration = models.PositiveIntegerField(blank=True, null=True)  # Duration of the interval in minutes
 
     def __str__(self):
-        return f'Show of {self.movie.name} at {self.cinema.name} on {self.start_time}'
+        return f'Show of {self.movie.name} at {self.cinema} starting {self.start_time}'
